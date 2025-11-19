@@ -99,7 +99,7 @@
               'theme_location' => 'footer-menu-right',
               'container' => false,
               'items_wrap' => '<div class="text-[#CBCBCB] text-[11px] lg:text-[14px] font-sansFanumRegular flex flex-col gap-y-2">%3$s</div>',
-              'walker' => new Footer_Useful_Links_Walker(),
+              'walker' => new \IdealBoresh\Presentation\Menu\FooterUsefulLinksWalker(),
             ]);
             ?>
           <?php endif; ?>
@@ -125,7 +125,7 @@
               'theme_location' => 'footer-menu-middle',
               'container' => false,
               'items_wrap' => '<div class="text-[#CBCBCB] text-[11px] lg:text-[14px] font-sansFanumRegular flex flex-col gap-y-2">%3$s</div>',
-              'walker' => new Footer_Useful_Links_Walker(),
+              'walker' => new \IdealBoresh\Presentation\Menu\FooterUsefulLinksWalker(),
             ]);
             ?>
           <?php endif; ?>
@@ -150,7 +150,7 @@
               'theme_location' => 'footer-menu-left',
               'container' => false,
               'items_wrap' => '<div class="text-[#CBCBCB] text-[11px] lg:text-[14px] font-sansFanumRegular flex flex-col gap-y-2">%3$s</div>',
-              'walker' => new Footer_Useful_Links_Walker(),
+              'walker' => new \IdealBoresh\Presentation\Menu\FooterUsefulLinksWalker(),
             ]);
             ?>
           <?php endif; ?>
@@ -182,20 +182,20 @@
 
   <?php if ($whatsapp_number && $options['whatsapp_icon']): ?>
     <a class="z-[150] left-[30px] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4"
-      href="https://wa.me/+98<?php echo esc_attr($whatsapp_number ?? ''); ?>">
-      <img class="w-8" src="<?php echo esc_attr($options['whatsapp_icon'] ?? ''); ?>" alt="Support">
+      href="<?php echo esc_url('https://wa.me/+98' . $whatsapp_number); ?>">
+      <img class="w-8" src="<?php echo esc_url($options['whatsapp_icon'] ?? ''); ?>" alt="Support">
     </a>
   <?php endif; ?>
   <?php if ($options['contact_number'] && $options['contact_icon']): ?>
     <a href="tel:<?php echo esc_attr($options['contact_number'] ?? ''); ?>"
       class="right-[30px] lg:hidden w-[60px] h-[60px] z-[150] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4">
-      <img class="w-8 w-[25px]" src="<?php echo esc_attr($options['contact_icon'] ?? ''); ?>" alt="call">
+      <img class="w-8 w-[25px]" src="<?php echo esc_url($options['contact_icon'] ?? ''); ?>" alt="call">
     </a>
   <?php endif; ?>
   <?php if ($options['contact_url'] && $options['contact_icon']): ?>
-    <a href="<?php echo esc_attr($options['contact_url'] ?? ''); ?>"
+    <a href="<?php echo esc_url($options['contact_url'] ?? ''); ?>"
       class="right-[30px] hidden lg:flex w-[60px] h-[60px] z-[150] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4">
-      <img class="w-8 w-[25px]" src="<?php echo esc_attr($options['contact_icon'] ?? ''); ?>" alt="call">
+      <img class="w-8 w-[25px]" src="<?php echo esc_url($options['contact_icon'] ?? ''); ?>" alt="call">
     </a>
   <?php endif; ?>
 
@@ -258,21 +258,29 @@
       if (!btn) return;
       e.preventDefault();
 
+      var ajaxObject = window.ideal_ajax_object || {};
+      if (!ajaxObject.ajaxurl || !ajaxObject.nonce) {
+        showIdealToast('⚠ خطا در افزودن به سبد خرید.');
+        return;
+      }
+
       var pid = btn.getAttribute('data-product_id'),
         qty = btn.getAttribute('data-quantity') || 1,
         data = new FormData();
 
+      data.append('action', 'ideal_add_to_cart');
+      data.append('nonce', ajaxObject.nonce);
       data.append('product_id', pid);
       data.append('quantity', qty);
 
-      fetch('<?php echo esc_url(site_url('/?wc-ajax=add_to_cart')); ?>', {
+      fetch(ajaxObject.ajaxurl, {
         method: 'POST',
         credentials: 'same-origin',
         body: data
       })
         .then(function (res) { return res.json(); })
         .then(function (json) {
-          if (json.error) {
+          if (!json.success) {
             showIdealToast('⚠ خطا در افزودن به سبد خرید.');
           } else {
             showIdealToast('✔ محصول به سبد خرید اضافه شد.');

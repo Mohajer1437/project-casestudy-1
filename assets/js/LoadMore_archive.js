@@ -225,6 +225,9 @@ function add__to__cart(product_id){
 
     formData.append("action", "ideal_add_to_cart");
     formData.append("product_id", product_id);
+    if (typeof ideal_ajax_object !== 'undefined' && ideal_ajax_object.nonce) {
+        formData.append("nonce", ideal_ajax_object.nonce);
+    }
 
     xhr.open("POST", ajax.ajaxurl, true);
 

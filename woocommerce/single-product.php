@@ -20,8 +20,6 @@ if (!defined('ABSPATH')) {
 }
 ?>
 <?php get_header('shop'); ?>
-<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/product.css'; ?>" />
-<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/swiper-bundle.min.css'; ?>" />
 
 <body>
 

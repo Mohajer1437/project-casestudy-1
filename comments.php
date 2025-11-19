@@ -20,9 +20,9 @@ if ( ! defined( 'ABSPATH' ) ) {
         <ul class="comment-list">
             <?php
             wp_list_comments([
-                'callback' => 'custom_comments_list',
+                'walker'   => new \IdealBoresh\Presentation\Comments\IdealCommentWalker(),
                 'style'    => 'ul',
-                'max_depth' => 3
+                'max_depth' => 3,
             ]);
             ?>
         </ul>

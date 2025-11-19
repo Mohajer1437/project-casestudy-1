@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <?php endif; ?>
     <?php wp_head() ?>
 </head>
+<?php $idealboresh_cart_count = function_exists('WC') && WC()->cart ? (int) WC()->cart->get_cart_contents_count() : 0; ?>
 <!-- navbar -->
 <!-- header desktop -->
 <header class="hidden lg:block">
@@ -103,7 +104,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
         <div class="flex justify-start gap-x-2">
-            <a href="<?php echo get_home_url(); ?>">
+            <a href="<?php echo esc_url(home_url('/')); ?>">
                 <?php
                 $logo = get_theme_mod('theme_logo');
                 if (!empty($logo)) {
@@ -143,7 +144,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <div class="flex items-center justify-start gap-x-2">
 
-            <a href="<?php echo get_home_url(); ?>/my-account"
+            <a href="<?php echo esc_url(home_url('/my-account')); ?>"
                 class="p-[11px] flex justify-start items-center bg-white rounded-xl gap-x-2">
 
                 <svg class="w-7 h-7">
@@ -154,11 +155,11 @@ if ( ! defined( 'ABSPATH' ) ) {
             </a>
 
 
-            <a href="<?php echo get_home_url(); ?>/cart"
+            <a href="<?php echo esc_url(home_url('/cart')); ?>"
                 class="p-[11px] flex justify-start items-center bg-white rounded-xl gap-x-2 w-fit relative">
                 <div style="font-size: 10px;"
                     class="absolute top-0 right-0 bg-red-500 rounded-full w-4 h-4 font-sansFanumBold flex items-center justify-center text-white">
-                    <?php echo WC()->cart->get_cart_contents_count(); ?>
+                    <?php echo esc_html((string) $idealboresh_cart_count); ?>
                 </div>
 
                 <svg class="w-7 h-7">
@@ -355,7 +356,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </svg>
             </div>
 
-            <a href="<?php echo get_home_url(); ?>">
+            <a href="<?php echo esc_url(home_url('/')); ?>">
                 <?php
                 $logo = get_theme_mod('theme_logo');
                 if (!empty($logo)) {
@@ -373,7 +374,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div id="controler__icon__menu__bar"
                 class="flex items-center justify-start gap-x-2 transition-all duration-300">
 
-                <a href="<?php echo get_home_url(); ?>/my-account"
+            <a href="<?php echo esc_url(home_url('/my-account')); ?>"
                     class="p-[11px] flex justify-start items-center bg-white rounded-xl gap-x-2">
 
                     <svg class="w-7 h-7">
@@ -383,11 +384,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </a>
 
 
-                <a href="<?php echo get_home_url(); ?>/cart"
+            <a href="<?php echo esc_url(home_url('/cart')); ?>"
                     class="p-[11px] flex justify-start items-center bg-white rounded-xl gap-x-2 w-fit relative">
                     <div style="font-size: 10px;"
                         class="absolute top-0 right-0 bg-red-500 rounded-full w-4 h-4 font-sansFanumBold flex items-center justify-center text-white">
-                        <?php echo WC()->cart->get_cart_contents_count(); ?>
+                        <?php echo esc_html((string) $idealboresh_cart_count); ?>
                     </div>
                     <svg class="w-7 h-7">
                         <use href="#cartCheck"></use>
@@ -406,7 +407,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
             <div>
-                <a href="<?php echo get_home_url(); ?>" class="w-[89px] mt-1 mr-3">
+                <a href="<?php echo esc_url(home_url('/')); ?>" class="w-[89px] mt-1 mr-3">
                     <?php
                     $logo = get_theme_mod('theme_logo');
                     if (!empty($logo)) {

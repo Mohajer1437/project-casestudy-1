@@ -1,6 +1,4 @@
 <?php get_header(); ?>
-<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/about.css'; ?>">
-<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/swiper-bundle.min.css'; ?>" />
 
 <body style="background-color: #F9F9F9;">
     
