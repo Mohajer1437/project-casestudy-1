@@ -1,0 +1,27 @@
+/*
+Theme Name: Ideal Boresh
+Theme URI: https://idealboresh.com/
+Author: Ali Mohajeri
+Author URI: https://alimohajeri.ir
+Description: Ideal Boresh
+Tested up to: 6.6
+Requires PHP: 7.0
+Version: 1.1.5
+Text Domain: idealboresh
+*/
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-container .select2-selection--single {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.select2-container .select2-selection__rendered {
+    padding-left: 10px;
+    font-size: 14px;
+}

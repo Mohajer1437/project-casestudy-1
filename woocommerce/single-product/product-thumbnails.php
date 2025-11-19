@@ -1,0 +1,53 @@
+<?php
+/**
+ * Single Product Thumbnails
+ *
+ * This template can be overridden by copying it to yourtheme/woocommerce/single-product/product-thumbnails.php.
+ *
+ * HOWEVER, on occasion WooCommerce will need to update template files and you
+ * (the theme developer) will need to copy the new files to your theme to
+ * maintain compatibility. We try to do this as little as possible, but it does
+ * happen. When this occurs the version of the template file will be bumped and
+ * the readme will list any important changes.
+ *
+ * @see         https://woocommerce.com/document/template-structure/
+ * @package     WooCommerce\Templates
+ * @version     9.5.0
+ */
+
+defined( 'ABSPATH' ) || exit;
+
+// Note: `wc_get_gallery_image_html` was added in WC 3.3.2 and did not exist prior. This check protects against theme overrides being used on older versions of WC.
+if ( ! function_exists( 'wc_get_gallery_image_html' ) ) {
+	return;
+}
+
+global $product;
+
+$attachment_ids = $product->get_gallery_image_ids();?>
+
+<div thumbsSlider="" class="hidden lg:inline mt-12">
+    <div  class="swiper mySwiper w-[400px] hidden ">
+        <div class="swiper-wrapper 555">
+<?php
+if ( $attachment_ids && $product->get_image_id() ) {
+	foreach ( $attachment_ids as $key => $attachment_id ) {
+		/**
+		 * Filter product image thumbnail HTML string.
+		 *
+		 * @since 1.6.4
+		 *
+		 * @param string $html          Product image thumbnail HTML string.
+		 * @param int    $attachment_id Attachment ID.
+		 */
+        echo '<div class="swiper-slide py-5"><img class="rounded-xl" src='.wp_get_attachment_url($attachment_id ).'></div>';
+	}
+}?>
+        </div>
+
+
+<!--        <div class="absolute top-[5%] right-[5%] bg-[#D0082C] z-50 px-3 py-2 rounded-xl">-->
+<!--            <p class="font-sansFanumBold text-white">15%</p>-->
+<!--        </div>-->
+    </div>
+</div>

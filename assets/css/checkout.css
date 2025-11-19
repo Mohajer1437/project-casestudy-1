@@ -1,0 +1,74 @@
+input#email,.wc-block-components-address-card,
+input#shipping-first_name,
+input#shipping-last_name,
+select#shipping-state,
+input#shipping-city,
+input#shipping-address_1,
+input#shipping-address_2,
+input#shipping-postcode,
+input#shipping-phone,
+label.wc-block-components-radio-control__option.wc-block-components-radio-control__option-checked.wc-block-components-radio-control__option--checked-option-highlighted,
+.wc-block-components-radio-control-accordion-option.wc-block-components-radio-control-accordion-option--checked-option-highlighted,
+select#billing-country,
+input#billing-first_name,
+input#billing-last_name,
+select#billing-state,
+input#billing-city,
+input#billing-address_1,
+input#billing-address_2,
+input#billing-postcode,
+input#billing-phone,
+textarea.wc-block-components-textarea {
+    border-radius: 8px !important;
+}
+
+
+a.wc-block-components-checkout-return-to-cart-button{
+    background: #233d82;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    padding-right: 25px;
+    border-radius: 8px;
+    margin-right: auto;
+    margin-left: auto;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+span.wc-block-components-button__text{
+    background: #233d82;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 8px;
+    margin-right: auto;
+    margin-left: auto;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+
+a.wc-block-components-checkout-return-to-cart-button:hover,
+span.wc-block-components-button__text:hover{
+    background: #3154b4 !important;
+}
+
+.wp-block-woocommerce-checkout-order-summary-block {
+    border-radius: 20px !important;
+    border: 2px solid #d1d1d1 !important;
+    transform: scale(0.95) !important;
+    padding-right: 1rem !important;
+    padding-left: 1rem !important;
+}
+
+.wc-block-components-main.wc-block-checkout__main.wp-block-woocommerce-checkout-fields-block {
+    border-radius: 20px !important;
+    border: 2px solid #d1d1d1 !important;
+    transform: scale(0.95) !important;
+    padding-right: 1rem !important;
+    padding-left: 1rem !important;
+}

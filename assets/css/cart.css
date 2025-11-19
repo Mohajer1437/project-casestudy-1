@@ -1,0 +1,77 @@
+/* دو بخش اصلی */
+.wc-block-components-main.wc-block-cart__main.wp-block-woocommerce-cart-items-block,
+.wc-block-components-sidebar.wc-block-cart__sidebar.wp-block-woocommerce-cart-totals-block {
+    border-radius: 20px !important;
+    border: 2px solid #d1d1d1;
+    transform: scale(0.95);
+}
+
+/* دکمه پرداخت */
+a.wc-block-components-button.wp-element-button.wc-block-cart__submit-button.contained {
+    background: #233d82;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    border-radius: 8px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 30px;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+/* دکمه کوپن */
+button.wc-block-components-button.wp-element-button.wc-block-components-totals-coupon__button.contained,
+button.wc-block-components-button.wp-element-button.wc-block-components-shipping-calculator-address__button.outlined {
+    background: #233d82;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 8px;
+    margin-right: auto;
+    margin-left: auto;
+    color: white;
+    transition: all 0.3s ease-in-out;
+}
+
+button.wc-block-components-button.wp-element-button.wc-block-components-totals-coupon__button.contained:hover,
+a.wc-block-components-button.wp-element-button.wc-block-cart__submit-button.contained:hover,
+button.wc-block-cart-item__remove-link:hover,
+button.wc-block-components-button.wp-element-button.wc-block-components-shipping-calculator-address__button.outlined:hover {
+    background: #3154b4 !important;
+}
+
+.wc-block-cart-item__quantity {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wc-block-components-quantity-selector {
+    border-radius: 8px;
+    border: 1px solid;
+}
+
+input#wc-block-components-totals-coupon__input-coupon {
+    border-radius: 8px;
+}
+
+button.wc-block-cart-item__remove-link {
+    background: #233d82 !important;
+    width: fit-content;
+    padding: 12px !important;
+    border-radius: 8px !important;
+    color: white !important;
+    transition: all 0.3s ease-in-out;
+    text-decoration: none !important;
+}
+
+select#\30 -country,
+select#\30 -state,
+input#\30 -city,
+input#\30 -postcode {
+    border-radius: 8px;
+}
