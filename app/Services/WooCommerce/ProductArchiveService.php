@@ -56,8 +56,8 @@ class ProductArchiveService implements ProductArchiveInterface
         $percentage = max(0, $percentage);
 
         return sprintf(
-            '<span style="z-index: 29; top: 20px; right: 10px;" class="absolute bg-[#D0082C] font-sansFanumBold text-white px-3 py-2 rounded-xl">٪%s</span>',
-            esc_html((string) $percentage)
+            '<span style="z-index: 29; top: 20px; right: 10px;" class="absolute bg-[#D0082C] font-sansFanumBold text-white px-3 py-2 rounded-xl">٪%d</span>',
+            $percentage
         );
     }
 }

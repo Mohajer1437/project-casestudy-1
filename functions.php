@@ -6,8 +6,12 @@ require_once get_template_directory() . '/app/Support/Autoloader.php';
 $autoloader = new \IdealBoresh\Support\Autoloader();
 $autoloader->register();
 
-$container = new \IdealBoresh\Core\Container();
-\IdealBoresh\Core\ContainerResolver::boot($container);
-
-$kernel = new \IdealBoresh\App\Kernel($container);
+$kernel = new \IdealBoresh\App\Kernel();
 $kernel->boot();
+
+if (!function_exists('DiscountCalculation')) {
+    function DiscountCalculation($RegularPrice, $SalePrice): int
+    {
+        return \IdealBoresh\Domain\Product\DiscountCalculator::calculate((float) $RegularPrice, (float) $SalePrice);
+    }
+}

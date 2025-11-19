@@ -2,18 +2,18 @@
 
 namespace IdealBoresh\Domain\Cart;
 
-class CartService implements CartServiceInterface
+class CartService
 {
     public function __construct(private CartRepositoryInterface $repository)
     {
     }
 
-    public function addProduct(int $productId, int $quantity = 1): bool
+    public function addProduct(int $productId): bool
     {
         if ($productId <= 0) {
             return false;
         }
 
-        return $this->repository->addProduct($productId, $quantity);
+        return $this->repository->addProduct($productId);
     }
 }
