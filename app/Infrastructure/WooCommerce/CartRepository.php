@@ -6,7 +6,7 @@ use IdealBoresh\Domain\Cart\CartRepositoryInterface;
 
 class CartRepository implements CartRepositoryInterface
 {
-    public function addProduct(int $productId): bool
+    public function addProduct(int $productId, int $quantity = 1): bool
     {
         if (!function_exists('WC')) {
             return false;
@@ -18,6 +18,8 @@ class CartRepository implements CartRepositoryInterface
             return false;
         }
 
-        return (bool) $cart->add_to_cart($productId);
+        $quantity = max(1, $quantity);
+
+        return (bool) $cart->add_to_cart($productId, $quantity);
     }
 }

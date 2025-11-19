@@ -4,6 +4,7 @@ namespace IdealBoresh\App;
 
 use IdealBoresh\Application\Cart\AddProductToCartAction;
 use IdealBoresh\Application\Cart\CartNonceProvider;
+use IdealBoresh\Application\Contact\ContactFormController;
 use IdealBoresh\Application\Cron\YoastScheduleRegistrar;
 use IdealBoresh\Application\Performance\HttpRequestOptimizer;
 use IdealBoresh\Application\Performance\WooCommerceTelemetryDisabler;
@@ -12,11 +13,14 @@ use IdealBoresh\Contracts\RegistersHooks;
 use IdealBoresh\Core\Container;
 use IdealBoresh\Domain\Cart\CartRepositoryInterface;
 use IdealBoresh\Domain\Cart\CartService;
+use IdealBoresh\Domain\Cart\CartServiceInterface;
 use IdealBoresh\Domain\Settings\OptionRepositoryInterface;
 use IdealBoresh\Domain\WooCommerce\SettingsRepositoryInterface;
 use IdealBoresh\Infrastructure\WooCommerce\CartRepository;
 use IdealBoresh\Infrastructure\WooCommerce\SettingsRepository;
 use IdealBoresh\Infrastructure\WordPress\OptionRepository;
+use IdealBoresh\Services\Theme\AssetManager;
+use IdealBoresh\Services\Theme\AssetManagerInterface;
 use IdealBoresh\Services\WooCommerce\ProductArchiveInterface;
 use IdealBoresh\Services\WooCommerce\ProductArchiveService;
 use IdealBoresh\Services\WooCommerce\ProductAttributeFilterInterface;
@@ -50,11 +54,11 @@ class Kernel
     private function registerBindings(): void
     {
         $this->container->set(CartRepositoryInterface::class, fn (): CartRepositoryInterface => new CartRepository());
-        $this->container->set(CartService::class, fn (Container $container): CartService => new CartService(
+        $this->container->set(CartServiceInterface::class, fn (Container $container): CartServiceInterface => new CartService(
             $container->get(CartRepositoryInterface::class)
         ));
         $this->container->set(AddProductToCartAction::class, fn (Container $container): AddProductToCartAction => new AddProductToCartAction(
-            $container->get(CartService::class)
+            $container->get(CartServiceInterface::class)
         ));
         $this->container->set(CartNonceProvider::class, fn (): CartNonceProvider => new CartNonceProvider(
             AddProductToCartAction::NONCE_ACTION
@@ -71,6 +75,9 @@ class Kernel
             $container->get(OptionRepositoryInterface::class)
         ));
 
+        $this->container->set(AssetManagerInterface::class, fn (): AssetManagerInterface => new AssetManager());
+        $this->container->set(ContactFormController::class, fn (): ContactFormController => new ContactFormController());
+
         $this->container->set(WooCommerceTelemetryDisabler::class, fn (Container $container): WooCommerceTelemetryDisabler => new WooCommerceTelemetryDisabler(
             $container->get(SettingsRepositoryInterface::class)
         ));
@@ -82,6 +89,7 @@ class Kernel
     private function buildModules(): array
     {
         return [
+            $this->container->get(AssetManagerInterface::class),
             $this->container->get(AddProductToCartAction::class),
             $this->container->get(CartNonceProvider::class),
             $this->container->get(DisableRelatedProducts::class),
@@ -91,6 +99,7 @@ class Kernel
             $this->container->get(ProductArchiveInterface::class),
             $this->container->get(ProductAttributeFilterInterface::class),
             $this->container->get(ProductCategoryMetaInterface::class),
+            $this->container->get(ContactFormController::class),
         ];
     }
 }

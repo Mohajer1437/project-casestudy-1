@@ -11,10 +11,3 @@ $container = new \IdealBoresh\Core\Container();
 
 $kernel = new \IdealBoresh\App\Kernel($container);
 $kernel->boot();
-
-if (!function_exists('DiscountCalculation')) {
-    function DiscountCalculation($RegularPrice, $SalePrice): int
-    {
-        return \IdealBoresh\Domain\Product\DiscountCalculator::calculate((float) $RegularPrice, (float) $SalePrice);
-    }
-}

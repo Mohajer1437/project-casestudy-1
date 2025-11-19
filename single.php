@@ -1,5 +1,4 @@
 <?php get_header(); ?>
-<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/blog-post.css'; ?>">
 
 <body class="bg-[#F9F9F9]">
     

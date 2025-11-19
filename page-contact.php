@@ -1,5 +1,4 @@
 <?php get_header(); ?>
-<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/contact.css'; ?>">
 
 <body style="background-color: #F9F9F9;">
     
