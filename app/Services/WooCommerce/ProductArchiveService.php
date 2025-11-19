@@ -6,17 +6,11 @@ class ProductArchiveService implements ProductArchiveInterface
 {
     private int $productsPerPage;
 
-    /** @var array<int, string> */
-    private array $saleFlashCache = [];
-
     public function __construct(int $productsPerPage = 12)
     {
         $this->productsPerPage = max(1, $productsPerPage);
     }
 
-    /**
-     * Wire WooCommerce archive customizations.
-     */
     public function register(): void
     {
         add_filter('loop_shop_per_page', [$this, 'setProductsPerPage'], 20);
@@ -24,18 +18,11 @@ class ProductArchiveService implements ProductArchiveInterface
         add_action('init', [$this, 'customizeLoopHooks']);
     }
 
-    /**
-     * Force WooCommerce to always use the configured number of products per page.
-     */
     public function setProductsPerPage(int $products): int
     {
-        unset($products);
         return $this->productsPerPage;
     }
 
-    /**
-     * Remove redundant loop UI that is replaced by custom presenters.
-     */
     public function customizeLoopHooks(): void
     {
         remove_action('woocommerce_before_shop_loop', 'woocommerce_result_count', 20);
@@ -43,19 +30,11 @@ class ProductArchiveService implements ProductArchiveInterface
         remove_action('woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 10);
     }
 
-    /**
-     * Render a cached sale flash badge showing the discount percentage.
-     */
     public function renderSaleFlash(string $html, $post, \WC_Product $product): string
     {
         unset($post);
         if (!$product->is_on_sale()) {
             return $html;
-        }
-
-        $cacheKey = (int) $product->get_id();
-        if (isset($this->saleFlashCache[$cacheKey])) {
-            return $this->saleFlashCache[$cacheKey];
         }
 
         $regular = 0.0;
@@ -76,13 +55,9 @@ class ProductArchiveService implements ProductArchiveInterface
         $percentage = (int) round((($regular - $sale) / $regular) * 100);
         $percentage = max(0, $percentage);
 
-        $badge = sprintf(
-            '<span style="z-index: 29; top: 20px; right: 10px;" class="absolute bg-[#D0082C] font-sansFanumBold text-white px-3 py-2 rounded-xl">٪%s</span>',
-            esc_html((string) $percentage)
+        return sprintf(
+            '<span style="z-index: 29; top: 20px; right: 10px;" class="absolute bg-[#D0082C] font-sansFanumBold text-white px-3 py-2 rounded-xl">٪%d</span>',
+            $percentage
         );
-
-        $this->saleFlashCache[$cacheKey] = $badge;
-
-        return $badge;
     }
 }

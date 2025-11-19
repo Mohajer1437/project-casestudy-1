@@ -9,22 +9,15 @@ use ReflectionClass;
 class Container
 {
     /**
-     * Registered bindings for the container.
-     *
      * @var array<string, array{resolver: callable|string, shared: bool}>
      */
     private array $bindings = [];
 
     /**
-     * Shared instances keyed by service identifier.
-     *
      * @var array<string, mixed>
      */
     private array $instances = [];
 
-    /**
-     * Register a binding with the container.
-     */
     public function set(string $id, callable|string $resolver, bool $shared = true): void
     {
         $this->bindings[$id] = [
@@ -33,19 +26,11 @@ class Container
         ];
     }
 
-    /**
-     * Register a non-shared binding.
-     */
     public function factory(string $id, callable|string $resolver): void
     {
         $this->set($id, $resolver, false);
     }
 
-    /**
-     * Resolve a service from the container.
-     *
-     * @return mixed
-     */
     public function get(string $id)
     {
         if (isset($this->instances[$id])) {
@@ -71,11 +56,6 @@ class Container
         return $object;
     }
 
-    /**
-     * Build an object using the provided resolver.
-     *
-     * @return mixed
-     */
     private function build(callable|string $resolver, string $id)
     {
         if (is_string($resolver)) {
@@ -93,11 +73,6 @@ class Container
         return $resolver;
     }
 
-    /**
-     * Attempt to automatically resolve a class that has not been bound.
-     *
-     * @return mixed
-     */
     private function autoResolve(string $id)
     {
         if (!class_exists($id)) {

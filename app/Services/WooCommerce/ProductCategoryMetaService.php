@@ -9,14 +9,6 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
     /** @var string[] */
     private array $brandTaxonomies = ['product_brand', 'pwb-brand', 'yith_product_brand'];
 
-    /** @var array<int, array<string, string>> */
-    private array $termMetaCache = [];
-
-    private const BRAND_TAX_TRANSIENT = 'ideal_brand_taxonomies';
-
-    /**
-     * Register all admin hooks for the product category meta fields.
-     */
     public function register(): void
     {
         add_action('admin_footer', [$this, 'hideDefaultDescription']);
@@ -59,7 +51,7 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
     public function renderFullDescriptionField(WP_Term $term, string $taxonomy): void
     {
         unset($taxonomy);
-        $value = $this->getTermMetaString($term->term_id, 'full_description');
+        $value = (string) get_term_meta($term->term_id, 'full_description', true);
         wp_nonce_field('save_full_description_nonce', 'full_description_nonce');
         ?>
         <tr class="form-field term-full-description-wrap">
@@ -127,7 +119,7 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
     public function renderCategoryShortDescriptionEditField(WP_Term $term, string $taxonomy): void
     {
         unset($taxonomy);
-        $shortDescription = $this->getTermMetaString($term->term_id, 'category_short_description');
+        $shortDescription = (string) get_term_meta($term->term_id, 'category_short_description', true);
         wp_nonce_field('save_category_short_description', 'category_short_description_nonce');
         ?>
         <tr class="form-field">
@@ -261,7 +253,7 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
 
     public function registerBrandShortDescriptionHooks(): void
     {
-        foreach ($this->getAvailableBrandTaxonomies() as $taxonomy) {
+        foreach ($this->brandTaxonomies as $taxonomy) {
             if (!taxonomy_exists($taxonomy)) {
                 continue;
             }
@@ -300,7 +292,7 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
     public function renderBrandShortDescriptionEditField(WP_Term $term, string $taxonomy): void
     {
         unset($taxonomy);
-        $shortDescription = $this->getTermMetaString($term->term_id, 'brand_short_description');
+        $shortDescription = (string) get_term_meta($term->term_id, 'brand_short_description', true);
         wp_nonce_field('save_brand_short_description', 'brand_short_description_nonce');
         ?>
         <tr class="form-field">
@@ -359,37 +351,5 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
 
         $nonce = wp_unslash($_POST[$field]);
         return (bool) wp_verify_nonce($nonce, $action);
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getAvailableBrandTaxonomies(): array
-    {
-        $taxonomies = get_transient(self::BRAND_TAX_TRANSIENT);
-        if (is_array($taxonomies)) {
-            return $taxonomies;
-        }
-
-        $taxonomies = array_filter(
-            $this->brandTaxonomies,
-            static fn (string $taxonomy): bool => taxonomy_exists($taxonomy)
-        );
-
-        set_transient(self::BRAND_TAX_TRANSIENT, $taxonomies, DAY_IN_SECONDS);
-
-        return $taxonomies;
-    }
-
-    private function getTermMetaString(int $termId, string $metaKey): string
-    {
-        if (isset($this->termMetaCache[$termId][$metaKey])) {
-            return $this->termMetaCache[$termId][$metaKey];
-        }
-
-        $value = (string) get_term_meta($termId, $metaKey, true);
-        $this->termMetaCache[$termId][$metaKey] = $value;
-
-        return $value;
     }
 }

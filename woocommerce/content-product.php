@@ -8,13 +8,28 @@
 
 defined('ABSPATH') || exit;
 
+use IdealBoresh\Core\ContainerResolver;
+use IdealBoresh\Services\WooCommerce\ProductCardPresenterInterface;
+use Throwable;
+
 global $product;
 
 if (!is_a($product, WC_Product::class) || !$product->is_visible()) {
     return;
 }
 
-$context = apply_filters('idealboresh/product_card/context', [], $product);
+$context = [];
+$container = ContainerResolver::getInstance();
+
+if ($container) {
+    try {
+        /** @var ProductCardPresenterInterface $presenter */
+        $presenter = $container->get(ProductCardPresenterInterface::class);
+        $context = $presenter->buildContext($product);
+    } catch (Throwable $e) {
+        $context = [];
+    }
+}
 
 $productId = (int) ($context['id'] ?? $product->get_id());
 $brand = $context['brand'] ?? [];

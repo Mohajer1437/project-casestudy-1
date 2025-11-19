@@ -6,11 +6,7 @@ class ProductAttributeFilterService implements ProductAttributeFilterInterface
 {
     private const FILTER_HOOK = 'idealboresh/archive/popular_attributes';
     private const CACHE_GROUP = 'idealboresh_archive_attributes';
-    private const TRANSIENT_PREFIX = 'ideal_attr_filter_';
 
-    /**
-     * Register the archive attribute filter hook.
-     */
     public function register(): void
     {
         add_filter(self::FILTER_HOOK, [$this, 'getPopularAttributes'], 10, 3);
@@ -28,30 +24,20 @@ class ProductAttributeFilterService implements ProductAttributeFilterInterface
 
         $minProducts = max(1, $minProducts);
         $cacheKey = sprintf('%d_%d', $categoryId, $minProducts);
-        $transientKey = self::TRANSIENT_PREFIX . $cacheKey;
-        $cached = get_transient($transientKey);
-        if (is_array($cached)) {
-            wp_cache_set($cacheKey, $cached, self::CACHE_GROUP, HOUR_IN_SECONDS);
-            return $cached;
-        }
-
         $cached = wp_cache_get($cacheKey, self::CACHE_GROUP);
         if (is_array($cached)) {
-            set_transient($transientKey, $cached, HOUR_IN_SECONDS);
             return $cached;
         }
 
         $termIds = $this->getTermIds($categoryId);
         if (empty($termIds)) {
             wp_cache_set($cacheKey, [], self::CACHE_GROUP, HOUR_IN_SECONDS);
-            set_transient($transientKey, [], HOUR_IN_SECONDS);
             return [];
         }
 
         $taxonomies = $this->queryAttributeTaxonomies($termIds, $minProducts);
         if (empty($taxonomies)) {
             wp_cache_set($cacheKey, [], self::CACHE_GROUP, HOUR_IN_SECONDS);
-            set_transient($transientKey, [], HOUR_IN_SECONDS);
             return [];
         }
 
@@ -77,7 +63,6 @@ class ProductAttributeFilterService implements ProductAttributeFilterInterface
         }
 
         wp_cache_set($cacheKey, $results, self::CACHE_GROUP, HOUR_IN_SECONDS);
-        set_transient($transientKey, $results, HOUR_IN_SECONDS);
 
         return $results;
     }
