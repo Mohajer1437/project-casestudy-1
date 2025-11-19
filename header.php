@@ -16,6 +16,19 @@ if ( ! defined( 'ABSPATH' ) ) {
         <link rel="icon" href="<?php echo esc_url(get_site_icon_url()); ?>" type="image/png">
     <?php endif; ?>
     <?php wp_head() ?>
+    <?php
+    $header_context = get_query_var('idealboresh_header_context', []);
+    $header_logo = $header_context['logo'] ?? [];
+    $header_site_name = $header_context['site_name'] ?? get_bloginfo('name');
+    $header_cart_count = (int) ($header_context['cart_count'] ?? 0);
+    $header_home_url = $header_context['home_url'] ?? home_url('/');
+    $header_account_url = $header_context['account_url'] ?? home_url('/my-account');
+    $header_cart_url = $header_context['cart_url'] ?? home_url('/cart');
+    $header_phone = $header_context['phone'] ?? ['display' => '', 'href' => ''];
+    $header_nav_items = $header_context['nav_items'] ?? [];
+    $header_nav_panels = $header_context['nav_panels'] ?? [];
+    $header_mobile_menu = $header_context['mobile_menu'] ?? [];
+    ?>
 </head>
 <!-- navbar -->
 <!-- header desktop -->
@@ -103,17 +116,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
         <div class="flex justify-start gap-x-2">
-            <a href="<?php echo get_home_url(); ?>">
-                <?php
-                $logo = get_theme_mod('theme_logo');
-                if (!empty($logo)) {
-                    echo '<img
-                        src="' . esc_url($logo) . '"
-                        alt="logo" />';
-                } else {
-                    echo '<h1 class="site-title">' . get_bloginfo('name') . '</h1>'; // نمایش نام سایت در صورت نبود لوگو
-                }
-                ?>
+            <a href="<?php echo esc_url($header_home_url); ?>">
+                <?php if (!empty($header_logo['url'])): ?>
+                    <img src="<?php echo esc_url($header_logo['url']); ?>" alt="<?php echo esc_attr($header_logo['alt'] ?? $header_site_name); ?>" />
+                <?php else: ?>
+                    <h1 class="site-title"><?php echo esc_html($header_site_name); ?></h1>
+                <?php endif; ?>
             </a>
             <div class="relative">
                 <div class="bg-white h-fit p-2 flex items-center justify-start gap-x-3 rounded-xl">
@@ -143,7 +151,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <div class="flex items-center justify-start gap-x-2">
 
-            <a href="<?php echo get_home_url(); ?>/my-account"
+            <a href="<?php echo esc_url($header_account_url); ?>"
                 class="p-[11px] flex justify-start items-center bg-white rounded-xl gap-x-2">
 
                 <svg class="w-7 h-7">
@@ -154,11 +162,11 @@ if ( ! defined( 'ABSPATH' ) ) {
             </a>
 
 
-            <a href="<?php echo get_home_url(); ?>/cart"
+            <a href="<?php echo esc_url($header_cart_url); ?>"
                 class="p-[11px] flex justify-start items-center bg-white rounded-xl gap-x-2 w-fit relative">
                 <div style="font-size: 10px;"
                     class="absolute top-0 right-0 bg-red-500 rounded-full w-4 h-4 font-sansFanumBold flex items-center justify-center text-white">
-                    <?php echo WC()->cart->get_cart_contents_count(); ?>
+                    <?php echo esc_html((string) $header_cart_count); ?>
                 </div>
 
                 <svg class="w-7 h-7">
@@ -181,52 +189,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
         <ul class="flex items-center lg:gap-x-4 xl:gap-x-6 text-detail text-white h-[55px]">
-            <?php
-            $menu_name = 'header-mega-menu'; // نام جایگاه منو در وردپرس
-            $locations = get_nav_menu_locations();
-            $menu_counter = 1; // شمارنده برای ID منوها
-            
-            if (isset($locations[$menu_name])) {
-                $menu_id = $locations[$menu_name];
-                $menu_items = wp_get_nav_menu_items($menu_id);
-
-                $menu_structure = []; // ساختار درختی منو
-                foreach ($menu_items as $item) {
-                    if ($item->menu_item_parent == 0) {
-                        $menu_structure[$item->ID] = [
-                            'item' => $item,
-                            'children' => []
-                        ];
-                    } else {
-                        if (!isset($menu_structure[$item->menu_item_parent])) {
-                            $menu_structure[$item->menu_item_parent] = ['children' => []];
-                        }
-                        $menu_structure[$item->menu_item_parent]['children'][] = $item;
-                    }
-                }
-
-                foreach ($menu_structure as $menu_id => $menu_data) {
-                    if (!isset($menu_data['item'])) {
-                        continue; // اگر مقدار item وجود نداشت، ادامه بده تا خطا ندهد
-                    }
-
-                    $menu_item = $menu_data['item'];
-                    $children = $menu_data['children'] ?? [];
-                    $has_children = !empty($children); // بررسی وجود زیرمنو
-            
-                    // فقط اگر زیرمنو دارد، data-megamenu و id را اضافه کن
-                    $menu_id_attr = $has_children ? "menu" . $menu_counter : "";
-                    // echo '<pre>';
-                    // var_dump($menu_item);
-                    // echo '</pre>';
-                    ?>
-                    <li class="cursor-pointer h-full flex items-center group relative" <?php echo $has_children ? 'data-megamenu="' . esc_attr($menu_id_attr) . '"' : ''; ?>>
+            <?php if (!empty($header_nav_items)): ?>
+                <?php foreach ($header_nav_items as $nav_item): ?>
+                    <li class="cursor-pointer h-full flex items-center group relative"
+                        <?php echo !empty($nav_item['panel_id']) ? 'data-megamenu="' . esc_attr($nav_item['panel_id']) . '"' : ''; ?>>
                         <ul>
                             <li class="flex items-center justify-start gap-x-2">
-                                <a href="<?php echo esc_url($menu_item->url); ?>" class="depth0 group-hover:scale-110 transition-all duration-500">
-                                    <?php echo esc_html($menu_item->title); ?>
+                                <a href="<?php echo esc_url($nav_item['url'] ?? '#'); ?>" class="depth0 group-hover:scale-110 transition-all duration-500">
+                                    <?php echo esc_html($nav_item['title'] ?? ''); ?>
                                 </a>
-                                <?php if ($has_children): ?>
+                                <?php if (!empty($nav_item['has_children'])): ?>
                                     <svg class="w-[18px] h-[18px] group-hover:rotate-180 transition-all duration-500">
                                         <use href="#chevron-down"></use>
                                     </svg>
@@ -234,15 +206,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                             </li>
                         </ul>
                     </li>
-                    <?php
-                    if ($has_children) {
-                        $menu_counter++; // شمارنده را افزایش بده فقط اگر زیرمنو دارد
-                    }
-                }
-            } else {
-                echo '<li>منوی مورد نظر یافت نشد</li>';
-            }
-            ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <li><?php esc_html_e('منو تنظیم نشده است', 'idealboresh'); ?></li>
+            <?php endif; ?>
         </ul>
 
 
@@ -252,49 +219,31 @@ if ( ! defined( 'ABSPATH' ) ) {
         <!-- مگا منو -->
         <div id="MegamenuContent"
             class="bg-white border-8 border-nili-200 shadow-2xl absolute w-[93%] h-[70vh] group-hover:flex-col rounded-xl text-nowrap top-[78%] px-12 py-3 text-mainBlue space-y-4 font-sansFanumRegular mx-auto hidden pt-9 overflow-y-auto">
-            <?php
-            $menu_counter = 1;
-            foreach ($menu_structure as $menu_id => $menu_data) {
-                if (!isset($menu_data['item']))
-                    continue;
-
-                $menu_item = $menu_data['item'];
-                $children = $menu_data['children'] ?? [];
-
-                // فقط اگر زیرمنو دارد `a_mega__menu__part` ایجاد شود
-                if (!empty($children)) {
-                    $menu_id_attr = "menu" . $menu_counter;
-                    ?>
-                    <div id="<?php echo esc_attr($menu_id_attr); ?>" class="hidden a_mega__menu__part">
+            <?php if (!empty($header_nav_panels)): ?>
+                <?php foreach ($header_nav_panels as $panel): ?>
+                    <div id="<?php echo esc_attr($panel['panel_id'] ?? ''); ?>" class="hidden a_mega__menu__part">
                         <div class="grid grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-12">
-                            <?php foreach ($children as $child) { ?>
+                            <?php foreach ($panel['columns'] as $column): ?>
                                 <div class="space-y-4">
-                                    <a href="<?php echo esc_attr($child->url); ?>"
+                                    <a href="<?php echo esc_url($column['url'] ?? '#'); ?>"
                                         class="depth2 font-sansBold text-xl border-b-2 text-zinc-700 border-zinc-200 pb-2">
-                                        <?php echo esc_html($child->title); ?>
+                                        <?php echo esc_html($column['title'] ?? ''); ?>
                                     </a>
                                     <ul class="space-y-2 text-zinc-600 pr-2 cursor-pointer">
-                                        <?php
-                                        foreach ($menu_items as $sub_item) {
-                                            if ($sub_item->menu_item_parent == $child->ID) { ?>
-                                                <li class="transition-all duration-300 hover:scale-110">
-                                                    <a class="depth3" href="<?php echo esc_url($sub_item->url); ?>">
-                                                        <?php echo esc_html($sub_item->title); ?>
-                                                    </a>
-                                                </li>
-                                            <?php }
-                                        }
-                                        ?>
+                                        <?php foreach ($column['links'] as $link): ?>
+                                            <li class="transition-all duration-300 hover:scale-110">
+                                                <a class="depth3" href="<?php echo esc_url($link['url'] ?? '#'); ?>">
+                                                    <?php echo esc_html($link['title'] ?? ''); ?>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
                                     </ul>
                                 </div>
-                            <?php } ?>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-                    <?php
-                    $menu_counter++;
-                }
-            }
-            ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
 
@@ -302,12 +251,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
         <div class="flex justify-start items-center gap-x-2">
-            <?php
-            $phone_number = get_option('header_phone_number', '');
-            if ($phone_number):
-                ?>
-                <div class="tracking-wider"><?php echo esc_html($phone_number); ?></div>
-
+            <?php if (!empty($header_phone['display'])): ?>
+                <div class="tracking-wider"><?php echo esc_html($header_phone['display']); ?></div>
             <?php endif; ?>
 
             <div class="p-[6px] border-2 border-white w-fit rounded-full relative">
@@ -355,17 +300,12 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </svg>
             </div>
 
-            <a href="<?php echo get_home_url(); ?>">
-                <?php
-                $logo = get_theme_mod('theme_logo');
-                if (!empty($logo)) {
-                    echo '<img
-                        src="' . esc_url($logo) . '"
-                        alt="logo" />';
-                } else {
-                    echo '<h1 class="site-title">' . get_bloginfo('name') . '</h1>';
-                }
-                ?>
+            <a href="<?php echo esc_url($header_home_url); ?>">
+                <?php if (!empty($header_logo['url'])): ?>
+                    <img src="<?php echo esc_url($header_logo['url']); ?>" alt="<?php echo esc_attr($header_logo['alt'] ?? $header_site_name); ?>" />
+                <?php else: ?>
+                    <h1 class="site-title"><?php echo esc_html($header_site_name); ?></h1>
+                <?php endif; ?>
             </a>
 
 
@@ -373,7 +313,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div id="controler__icon__menu__bar"
                 class="flex items-center justify-start gap-x-2 transition-all duration-300">
 
-                <a href="<?php echo get_home_url(); ?>/my-account"
+            <a href="<?php echo esc_url($header_account_url); ?>"
                     class="p-[11px] flex justify-start items-center bg-white rounded-xl gap-x-2">
 
                     <svg class="w-7 h-7">
@@ -383,11 +323,11 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </a>
 
 
-                <a href="<?php echo get_home_url(); ?>/cart"
+            <a href="<?php echo esc_url($header_cart_url); ?>"
                     class="p-[11px] flex justify-start items-center bg-white rounded-xl gap-x-2 w-fit relative">
                     <div style="font-size: 10px;"
                         class="absolute top-0 right-0 bg-red-500 rounded-full w-4 h-4 font-sansFanumBold flex items-center justify-center text-white">
-                        <?php echo WC()->cart->get_cart_contents_count(); ?>
+                        <?php echo esc_html((string) $header_cart_count); ?>
                     </div>
                     <svg class="w-7 h-7">
                         <use href="#cartCheck"></use>
@@ -406,30 +346,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
             <div>
-                <a href="<?php echo get_home_url(); ?>" class="w-[89px] mt-1 mr-3">
-                    <?php
-                    $logo = get_theme_mod('theme_logo');
-                    if (!empty($logo)) {
-                        echo '<img
-                        src="' . esc_url($logo) . '"
-                        alt="logo" />';
-                    } else {
-                        echo '<h1 class="site-title">' . get_bloginfo('name') . '</h1>';
-                    }
-                    ?>
+                <a href="<?php echo esc_url($header_home_url); ?>" class="w-[89px] mt-1 mr-3">
+                    <?php if (!empty($header_logo['url'])): ?>
+                        <img src="<?php echo esc_url($header_logo['url']); ?>" alt="<?php echo esc_attr($header_logo['alt'] ?? $header_site_name); ?>" />
+                    <?php else: ?>
+                        <h1 class="site-title"><?php echo esc_html($header_site_name); ?></h1>
+                    <?php endif; ?>
                 </a>
             </div>
 
 
-            <?php
-            wp_nav_menu(array(
-                'theme_location' => 'header-mega-menu',
-                'container' => false,
-                'menu_class' => 'font-sansFanumBold mt-12 px-4 parent__item__menu',
-                'walker' => new Custom_Walker_Nav_Menu()
-            ));
-
-            ?>
+            <?php \IdealBoresh\Presentation\Menu\MobileMenuRenderer::render($header_mobile_menu); ?>
 
 
         </div>
@@ -526,11 +453,8 @@ if ( ! defined( 'ABSPATH' ) ) {
             </div>
 
         </div>
-        <?php
-        $phone_number = get_option('header_phone_number', '');
-        if ($phone_number):
-            ?>
-            <a href="<?php echo esc_url('tel:' . $phone_number); ?>"
+        <?php if (!empty($header_phone['href'])): ?>
+            <a href="<?php echo esc_url($header_phone['href']); ?>"
                 class="p-[6px] border-2 border-white w-fit rounded-full relative">
                 <div class="bg-sky-950 p-3 rounded-full ">
                     <svg class="w-4 h-4">

@@ -1,31 +1,32 @@
 <?php wp_footer(); ?>
+<?php
+$footer_context = get_query_var('idealboresh_footer_context', []);
+$footer_logo = $footer_context['logo'] ?? [];
+$footer_site_name = $footer_context['site_name'] ?? get_bloginfo('name');
+$footer_addresses = $footer_context['addresses'] ?? ['text' => '', 'email' => '', 'phone' => ''];
+$footer_social_icons = $footer_context['social_icons'] ?? [];
+$footer_enamad = $footer_context['enamad'] ?? '';
+$floating_contact = $footer_context['floating_contact'] ?? [];
+$footer_home_url = $footer_context['home_url'] ?? home_url('/');
+$floating_whatsapp = $floating_contact['whatsapp'] ?? [];
+$floating_phone = $floating_contact['phone'] ?? [];
+$floating_url = $floating_contact['url'] ?? [];
+?>
 <footer class="bg-foot-100 py-4 lg:py-8 overflow-x-hidden border-b-[18px] border-b-foot-200">
 
   <div class="grid grid-cols-1 lg:grid-cols-5 gap-x-2 container px-8">
 
     <div class="lg:col-span-2">
       <div class="font-sansFanumRegular text-[#CBCBCB] space-y-2 lg:space-y-5">
-        <a href="<?php echo get_home_url(); ?>">
-          <?php
-          $logo = get_theme_mod('theme_logo');
-          if (!empty($logo)) {
-            echo '<img
-              src="' . esc_url($logo) . '"
-              alt="logo" />';
-          } else {
-            echo '<h1 class="site-title">' . get_bloginfo('name') . '</h1>'; // نمایش نام سایت در صورت نبود لوگو
-          }
-          ?>
+        <a href="<?php echo esc_url($footer_home_url); ?>">
+          <?php if (!empty($footer_logo['url'])): ?>
+            <img src="<?php echo esc_url($footer_logo['url']); ?>" alt="<?php echo esc_attr($footer_logo['alt'] ?? $footer_site_name); ?>" />
+          <?php else: ?>
+            <h1 class="site-title"><?php echo esc_html($footer_site_name); ?></h1>
+          <?php endif; ?>
         </a>
         <div>
-          <?php
-          $footer_addresses = get_option('footer-addresses', array(
-            'text' => '',
-            'email' => '',
-            'phone' => ''
-          ));
-          if (!empty($footer_addresses['text'])):
-            ?>
+          <?php if (!empty($footer_addresses['text'])): ?>
             <p><?php echo esc_html($footer_addresses['text']); ?></p>
           <?php endif; ?>
         </div>
@@ -56,20 +57,14 @@
           </div>
         </div>
         <div>
-          <?php
-          $social_icons = get_option('footer_social_icons', '[]');
-          $social_icons = json_decode($social_icons, true);
-          if (!empty($social_icons)):
-            ?>
+          <?php if (!empty($footer_social_icons)): ?>
             <div class="flex items-center gap-x-1">
-              <?php foreach ($social_icons as $index => $icon): ?>
-
+              <?php foreach ($footer_social_icons as $icon): ?>
                 <a href="<?php echo esc_url($icon['link']); ?>" class="p-2 bg-foot-200 w-fit rounded-xl">
                   <img class="w-6 h-6" src="<?php echo esc_url($icon['image']); ?>" alt="">
                 </a>
               <?php endforeach; ?>
             </div>
-
           <?php endif; ?>
 
 
@@ -99,7 +94,7 @@
               'theme_location' => 'footer-menu-right',
               'container' => false,
               'items_wrap' => '<div class="text-[#CBCBCB] text-[11px] lg:text-[14px] font-sansFanumRegular flex flex-col gap-y-2">%3$s</div>',
-              'walker' => new Footer_Useful_Links_Walker(),
+              'walker' => new \IdealBoresh\Presentation\Menu\FooterUsefulLinksWalker(),
             ]);
             ?>
           <?php endif; ?>
@@ -125,7 +120,7 @@
               'theme_location' => 'footer-menu-middle',
               'container' => false,
               'items_wrap' => '<div class="text-[#CBCBCB] text-[11px] lg:text-[14px] font-sansFanumRegular flex flex-col gap-y-2">%3$s</div>',
-              'walker' => new Footer_Useful_Links_Walker(),
+              'walker' => new \IdealBoresh\Presentation\Menu\FooterUsefulLinksWalker(),
             ]);
             ?>
           <?php endif; ?>
@@ -150,7 +145,7 @@
               'theme_location' => 'footer-menu-left',
               'container' => false,
               'items_wrap' => '<div class="text-[#CBCBCB] text-[11px] lg:text-[14px] font-sansFanumRegular flex flex-col gap-y-2">%3$s</div>',
-              'walker' => new Footer_Useful_Links_Walker(),
+              'walker' => new \IdealBoresh\Presentation\Menu\FooterUsefulLinksWalker(),
             ]);
             ?>
           <?php endif; ?>
@@ -163,39 +158,28 @@
 
     <div class="mt-5  text-[#CBD8FF] font-sansFanumBold">
       <p>مجوز و نماد اعتماد الکترونیک</p>
-      <?php
-      $enamad_code = get_option('footer_enamad', '');
-      if (!empty($enamad_code)) {
-        echo $enamad_code;
-      }
-      ?>
+      <?php if (!empty($footer_enamad)) { echo $footer_enamad; } ?>
 
     </div>
 
   </div>
 
-  <?php
-  $options = get_option('floating_contact', []);
-  $whatsapp_number = ltrim($options['whatsapp_number'], '0');
-
-  ?>
-
-  <?php if ($whatsapp_number && $options['whatsapp_icon']): ?>
+  <?php if (!empty($floating_whatsapp['link']) && !empty($floating_whatsapp['icon'])): ?>
     <a class="z-[150] left-[30px] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4"
-      href="https://wa.me/+98<?php echo esc_attr($whatsapp_number ?? ''); ?>">
-      <img class="w-8" src="<?php echo esc_attr($options['whatsapp_icon'] ?? ''); ?>" alt="Support">
+      href="<?php echo esc_url($floating_whatsapp['link']); ?>">
+      <img class="w-8" src="<?php echo esc_url($floating_whatsapp['icon']); ?>" alt="Support">
     </a>
   <?php endif; ?>
-  <?php if ($options['contact_number'] && $options['contact_icon']): ?>
-    <a href="tel:<?php echo esc_attr($options['contact_number'] ?? ''); ?>"
+  <?php if (!empty($floating_phone['number']) && !empty($floating_phone['icon'])): ?>
+    <a href="tel:<?php echo esc_attr($floating_phone['number']); ?>"
       class="right-[30px] lg:hidden w-[60px] h-[60px] z-[150] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4">
-      <img class="w-8 w-[25px]" src="<?php echo esc_attr($options['contact_icon'] ?? ''); ?>" alt="call">
+      <img class="w-8 w-[25px]" src="<?php echo esc_url($floating_phone['icon']); ?>" alt="call">
     </a>
   <?php endif; ?>
-  <?php if ($options['contact_url'] && $options['contact_icon']): ?>
-    <a href="<?php echo esc_attr($options['contact_url'] ?? ''); ?>"
+  <?php if (!empty($floating_url['link']) && !empty($floating_url['icon'])): ?>
+    <a href="<?php echo esc_url($floating_url['link']); ?>"
       class="right-[30px] hidden lg:flex w-[60px] h-[60px] z-[150] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4">
-      <img class="w-8 w-[25px]" src="<?php echo esc_attr($options['contact_icon'] ?? ''); ?>" alt="call">
+      <img class="w-8 w-[25px]" src="<?php echo esc_url($floating_url['icon']); ?>" alt="call">
     </a>
   <?php endif; ?>
 
@@ -258,21 +242,29 @@
       if (!btn) return;
       e.preventDefault();
 
+      var ajaxObject = window.ideal_ajax_object || {};
+      if (!ajaxObject.ajaxurl || !ajaxObject.nonce) {
+        showIdealToast('⚠ خطا در افزودن به سبد خرید.');
+        return;
+      }
+
       var pid = btn.getAttribute('data-product_id'),
         qty = btn.getAttribute('data-quantity') || 1,
         data = new FormData();
 
+      data.append('action', 'ideal_add_to_cart');
+      data.append('nonce', ajaxObject.nonce);
       data.append('product_id', pid);
       data.append('quantity', qty);
 
-      fetch('<?php echo esc_url(site_url('/?wc-ajax=add_to_cart')); ?>', {
+      fetch(ajaxObject.ajaxurl, {
         method: 'POST',
         credentials: 'same-origin',
         body: data
       })
         .then(function (res) { return res.json(); })
         .then(function (json) {
-          if (json.error) {
+          if (!json.success) {
             showIdealToast('⚠ خطا در افزودن به سبد خرید.');
           } else {
             showIdealToast('✔ محصول به سبد خرید اضافه شد.');

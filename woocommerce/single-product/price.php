@@ -15,6 +15,8 @@
  * @version 3.0.0
  */
 
+use IdealBoresh\Domain\Product\DiscountCalculator;
+
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
@@ -25,13 +27,6 @@ $dollar_enabled = get_option('dollar_enabled', false); // مقدار پیش‌ف
 $dollar_price = get_option('dollar_price', '');
 $dollar = ($dollar_enabled === 'true') ? $dollar_price : 1;
 $dollar = number_format((float) $dollar, 0, '.', '');
-
-if (!function_exists('DiscountCalculation')) {
-    function DiscountCalculation($RegularPrice, $SalePrice): int
-    {
-        return ceil(($RegularPrice - $SalePrice) / $RegularPrice * 100);
-    }
-}
 ?>
 <?php if ($product->is_in_stock()): ?>
     <div class="w-fit self-end">
@@ -46,13 +41,13 @@ if (!function_exists('DiscountCalculation')) {
 
                 <?php if (!($SalePrice == 0 && $price_per_cm !== '')): ?>
                     <div class="flex items-center justify-between font-sansFanumBold">
-                        <del class="text-zinc-600 text-[13px] lg:text-[14px]"><?php echo $Regularprice ?></del>
+                        <del class="text-zinc-600 text-[13px] lg:text-[14px]"><?php echo esc_html(number_format((float) $Regularprice)); ?></del>
                         <p class="text-white bg-red-600 px-1 py-[2px] rounded-md text-[12px] lg:text-[14px]">
-                            <?php echo DiscountCalculation($Regularprice, $SalePrice) . '%'; ?></p>
+                            <?php echo esc_html(DiscountCalculator::calculate((float) $Regularprice, (float) $SalePrice)) . '%'; ?></p>
                     </div>
 
                     <div class="flex gap-x-1 items-center font-sansFanumBold">
-                        <p class="text-black text-[14px] lg:text-base"><?php echo number_format($SalePrice * $dollar); ?></p>
+                        <p class="text-black text-[14px] lg:text-base"><?php echo esc_html(number_format((float) $SalePrice * (float) $dollar)); ?></p>
                         <p class="text-mainBlue text-[10px]">تومان</p>
                     </div>
                 <?php endif; ?>
@@ -63,13 +58,13 @@ if (!function_exists('DiscountCalculation')) {
 
                 <?php if (!($SalePrice == 0 && $price_per_cm !== '')): ?>
                     <div class="flex items-center justify-between font-sansFanumBold">
-                        <del class="text-zinc-600 text-[13px] lg:text-[14px]"><?php echo $Regularprice * $dollar ?></del>
+                        <del class="text-zinc-600 text-[13px] lg:text-[14px]"><?php echo esc_html(number_format((float) $Regularprice * (float) $dollar)); ?></del>
                         <p class="text-white bg-red-600 px-1 py-[2px] rounded-md text-[12px] lg:text-[14px]">
-                            <?php echo DiscountCalculation($Regularprice, $SalePrice) . '%'; ?></p>
+                            <?php echo esc_html(DiscountCalculator::calculate((float) $Regularprice, (float) $SalePrice)) . '%'; ?></p>
                     </div>
 
                     <div class="flex gap-x-1 items-center font-sansFanumBold">
-                        <p class="text-black text-[14px] lg:text-base"><?php echo number_format($SalePrice * $dollar); ?></p>
+                        <p class="text-black text-[14px] lg:text-base"><?php echo esc_html(number_format((float) $SalePrice * (float) $dollar)); ?></p>
                         <p class="text-mainBlue text-[10px]">تومان</p>
                     </div>
                 <?php endif; ?>
@@ -81,7 +76,7 @@ if (!function_exists('DiscountCalculation')) {
 
                 <?php if (!($Regularprice == 0 && $price_per_cm !== '')): ?>
                     <div class="flex gap-x-1 items-center font-sansFanumBold">
-                        <p class="text-black text-[14px] lg:text-base"><?php echo number_format($Regularprice * $dollar); ?></p>
+                        <p class="text-black text-[14px] lg:text-base"><?php echo esc_html(number_format((float) $Regularprice * (float) $dollar)); ?></p>
                         <p class="text-mainBlue text-[10px]">تومان</p>
                     </div>
                 <?php endif; ?>
@@ -91,7 +86,7 @@ if (!function_exists('DiscountCalculation')) {
 
                 <?php if (!($Regularprice == 0 && $price_per_cm !== '')): ?>
                     <div class="flex gap-x-1 items-center font-sansFanumBold">
-                        <p class="text-black text-[14px] lg:text-base"><?php echo number_format($Regularprice * $dollar); ?></p>
+                        <p class="text-black text-[14px] lg:text-base"><?php echo esc_html(number_format((float) $Regularprice * (float) $dollar)); ?></p>
                         <p class="text-mainBlue text-[10px]">تومان</p>
                     </div>
                 <?php endif; ?>

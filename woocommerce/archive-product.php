@@ -18,7 +18,6 @@
 defined('ABSPATH') || exit;
 ?>
 <?php get_header(); ?>
-<link rel="stylesheet" href="<?php echo get_template_directory_uri() . '/assets/css/product-category.css'; ?>" />
 
 <?php
 /**
