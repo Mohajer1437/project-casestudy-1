@@ -1,6 +1,7 @@
 <?php
 $category = get_queried_object();
-$attributes = get_popular_attributes_in_category($category->term_id);
+$categoryId = isset($category->term_id) ? (int) $category->term_id : 0;
+$attributes = apply_filters('idealboresh/archive/popular_attributes', [], $categoryId, 4);
 $current = isset($_GET['orderby'])
     ? wc_clean(wp_unslash($_GET['orderby']))
     : apply_filters(
@@ -17,8 +18,8 @@ $orderby_options = apply_filters('woocommerce_catalog_orderby', array(
 ));
 ?>
 <div class="grid grid-cols-3 font-sansFanumRegular px-[18px] gap-x-2 gap-y-4 xl:hidden" id="taxonomy-mobile"
-    data-mobile_taxonomy="<?php echo esc_attr($category->taxonomy); ?>"
-    data-mobile_termid="<?php echo esc_attr($category->term_id); ?>">
+    data-mobile_taxonomy="<?php echo esc_attr($category->taxonomy ?? ''); ?>"
+    data-mobile_termid="<?php echo esc_attr((string) $categoryId); ?>">
     <!-- خانهٔ اول: سلکت‌باکس سورت کاستوم -->
     <div>
         <select style="width: 100%; max-width: 100%;" id="custom-orderby"
@@ -40,7 +41,7 @@ $orderby_options = apply_filters('woocommerce_catalog_orderby', array(
                     <?php echo esc_html(wc_attribute_label($attribute)); ?>
                 </option>
                 <?php foreach ($terms as $term): ?>
-                    <option value="<?php echo esc_attr($term['id']); ?>">
+                    <option value="<?php echo esc_attr((string) $term['id']); ?>">
                         <?php echo esc_html($term['name']); ?>
                     </option>
                 <?php endforeach; ?>
