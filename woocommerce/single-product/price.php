@@ -25,13 +25,6 @@ $dollar_enabled = get_option('dollar_enabled', false); // مقدار پیش‌ف
 $dollar_price = get_option('dollar_price', '');
 $dollar = ($dollar_enabled === 'true') ? $dollar_price : 1;
 $dollar = number_format((float) $dollar, 0, '.', '');
-
-if (!function_exists('DiscountCalculation')) {
-    function DiscountCalculation($RegularPrice, $SalePrice): int
-    {
-        return ceil(($RegularPrice - $SalePrice) / $RegularPrice * 100);
-    }
-}
 ?>
 <?php if ($product->is_in_stock()): ?>
     <div class="w-fit self-end">

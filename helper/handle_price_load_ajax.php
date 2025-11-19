@@ -4,14 +4,6 @@ defined('ABSPATH') || exit;
 
 global $product;
 
-if (!function_exists('DiscountCalculation')) {
-    function DiscountCalculation($RegularPrice, $SalePrice): int
-    {
-        if (!$RegularPrice) return 0;
-        return (int) ceil(($RegularPrice - $SalePrice) / $RegularPrice * 100);
-    }
-}
-
 /**
  * خروجی HTML قیمت کارت محصول برای رندر از طریق AJAX
  * - اگر محصول سانتیمتری باشد: حداقل قیمت = min_length × price_per_cm × min(TPI factor) × (dollar اگر فعال باشد)
