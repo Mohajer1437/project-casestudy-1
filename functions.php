@@ -1,12 +1,24 @@
 <?php
 
+use IdealBoresh\App\Kernel;
+use IdealBoresh\Core\Bootstrap;
+use IdealBoresh\Core\ContainerResolver;
+
 require_once get_template_directory() . '/bootstrap.php';
 require_once get_template_directory() . '/app/Support/Autoloader.php';
 
-$autoloader = new \IdealBoresh\Support\Autoloader();
-$autoloader->register();
+if (!defined('IDEALBORESH_AUTOLOADER_REGISTERED')) {
+    $autoloader = new \IdealBoresh\Support\Autoloader(get_template_directory());
+    $autoloader->register();
+    define('IDEALBORESH_AUTOLOADER_REGISTERED', true);
+}
 
-$kernel = new \IdealBoresh\App\Kernel();
+$bootstrap = new Bootstrap();
+$container = $bootstrap->boot();
+
+ContainerResolver::boot($container);
+
+$kernel = new Kernel($container);
 $kernel->boot();
 
 if (!function_exists('DiscountCalculation')) {

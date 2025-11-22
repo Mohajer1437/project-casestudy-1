@@ -11,6 +11,12 @@ $footer_home_url = $footer_context['home_url'] ?? home_url('/');
 $floating_whatsapp = $floating_contact['whatsapp'] ?? [];
 $floating_phone = $floating_contact['phone'] ?? [];
 $floating_url = $floating_contact['url'] ?? [];
+$floating_whatsapp_link = isset($floating_whatsapp['link']) ? (string) $floating_whatsapp['link'] : '';
+$floating_whatsapp_icon = isset($floating_whatsapp['icon']) ? (string) $floating_whatsapp['icon'] : '';
+$floating_phone_number = isset($floating_phone['number']) ? (string) $floating_phone['number'] : '';
+$floating_phone_icon = isset($floating_phone['icon']) ? (string) $floating_phone['icon'] : '';
+$floating_url_link = isset($floating_url['link']) ? (string) $floating_url['link'] : '';
+$floating_url_icon = isset($floating_url['icon']) ? (string) $floating_url['icon'] : '';
 ?>
 <footer class="bg-foot-100 py-4 lg:py-8 overflow-x-hidden border-b-[18px] border-b-foot-200">
 
@@ -164,22 +170,22 @@ $floating_url = $floating_contact['url'] ?? [];
 
   </div>
 
-  <?php if (!empty($floating_whatsapp['link']) && !empty($floating_whatsapp['icon'])): ?>
+  <?php if ($floating_whatsapp_link && $floating_whatsapp_icon): ?>
     <a class="z-[150] left-[30px] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4"
-      href="<?php echo esc_url('https://wa.me/+98' . $whatsapp_number); ?>">
-      <img class="w-8" src="<?php echo esc_url($options['whatsapp_icon'] ?? ''); ?>" alt="Support">
+      href="<?php echo esc_url($floating_whatsapp_link); ?>">
+      <img class="w-8" src="<?php echo esc_url($floating_whatsapp_icon); ?>" alt="Support">
     </a>
   <?php endif; ?>
-  <?php if (!empty($floating_phone['number']) && !empty($floating_phone['icon'])): ?>
-    <a href="tel:<?php echo esc_attr($floating_phone['number']); ?>"
+  <?php if ($floating_phone_number && $floating_phone_icon): ?>
+    <a href="tel:<?php echo esc_attr($floating_phone_number); ?>"
       class="right-[30px] lg:hidden w-[60px] h-[60px] z-[150] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4">
-      <img class="w-8 w-[25px]" src="<?php echo esc_url($options['contact_icon'] ?? ''); ?>" alt="call">
+      <img class="w-8 w-[25px]" src="<?php echo esc_url($floating_phone_icon); ?>" alt="call">
     </a>
   <?php endif; ?>
-  <?php if ($options['contact_url'] && $options['contact_icon']): ?>
-    <a href="<?php echo esc_url($options['contact_url'] ?? ''); ?>"
+  <?php if ($floating_url_link && $floating_url_icon): ?>
+    <a href="<?php echo esc_url($floating_url_link); ?>"
       class="right-[30px] hidden lg:flex w-[60px] h-[60px] z-[150] bg-[#3c4f87] fixed bottom-[70px] flex items-center justify-center rounded-full p-4">
-      <img class="w-8 w-[25px]" src="<?php echo esc_url($options['contact_icon'] ?? ''); ?>" alt="call">
+      <img class="w-8 w-[25px]" src="<?php echo esc_url($floating_url_icon); ?>" alt="call">
     </a>
   <?php endif; ?>
 

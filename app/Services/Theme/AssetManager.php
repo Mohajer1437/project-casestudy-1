@@ -17,13 +17,24 @@ class AssetManager implements AssetManagerInterface, RegistersHooks
             return;
         }
 
+        $this->enqueueBaseStyles();
+        $this->enqueuePageSpecificStyles();
+        $this->enqueueWooCommerceStyles();
+        $this->enqueueInteractiveScripts();
+    }
+
+    private function enqueueBaseStyles(): void
+    {
         wp_enqueue_style(
             'idealboresh-app',
             IDEALBORESH_THEME_URI . '/assets/css/app.css',
             [],
             IDEALBORESH_THEME_VERSION
         );
+    }
 
+    private function enqueuePageSpecificStyles(): void
+    {
         if (is_page_template('page-contact.php')) {
             wp_enqueue_style(
                 'idealboresh-contact',
@@ -74,19 +85,51 @@ class AssetManager implements AssetManagerInterface, RegistersHooks
             );
         }
 
+        if (function_exists('is_cart') && is_cart()) {
+            wp_enqueue_style(
+                'idealboresh-cart',
+                IDEALBORESH_THEME_URI . '/assets/css/cart.css',
+                ['idealboresh-app'],
+                IDEALBORESH_THEME_VERSION
+            );
+        }
+
+        if (function_exists('is_checkout') && is_checkout()) {
+            wp_enqueue_style(
+                'idealboresh-checkout',
+                IDEALBORESH_THEME_URI . '/assets/css/checkout.css',
+                ['idealboresh-app'],
+                IDEALBORESH_THEME_VERSION
+            );
+        }
+
+        if (function_exists('is_wc_endpoint_url') && is_wc_endpoint_url('lost-password')) {
+            wp_enqueue_style(
+                'idealboresh-lost-password',
+                IDEALBORESH_THEME_URI . '/assets/css/lost-password.css',
+                ['idealboresh-app'],
+                IDEALBORESH_THEME_VERSION
+            );
+        }
+
+        if (function_exists('is_account_page') && is_account_page()) {
+            wp_enqueue_style(
+                'idealboresh-login',
+                IDEALBORESH_THEME_URI . '/assets/css/login.css',
+                ['idealboresh-app'],
+                IDEALBORESH_THEME_VERSION
+            );
+        }
+    }
+
+    private function enqueueWooCommerceStyles(): void
+    {
         if (is_post_type_archive('product') || is_tax('product_cat') || is_tax('product_brand')) {
             wp_enqueue_style(
                 'idealboresh-product-archive',
                 IDEALBORESH_THEME_URI . '/assets/css/product-category.css',
                 ['idealboresh-app'],
                 IDEALBORESH_THEME_VERSION
-            );
-            wp_enqueue_script(
-                'idealboresh-archive-filters',
-                IDEALBORESH_THEME_URI . '/assets/js/LoadMore_archive.js',
-                [],
-                IDEALBORESH_THEME_VERSION,
-                true
             );
         }
 
@@ -99,7 +142,39 @@ class AssetManager implements AssetManagerInterface, RegistersHooks
             );
             $this->enqueueSwiperAssets();
         }
+    }
 
+    private function enqueueInteractiveScripts(): void
+    {
+        if (is_post_type_archive('product') || is_tax('product_cat') || is_tax('product_brand')) {
+            wp_enqueue_script(
+                'idealboresh-archive-filters',
+                IDEALBORESH_THEME_URI . '/assets/js/LoadMore_archive.js',
+                [],
+                IDEALBORESH_THEME_VERSION,
+                true
+            );
+        }
+
+        if (is_product_category()) {
+            wp_enqueue_script(
+                'idealboresh-tabs',
+                IDEALBORESH_THEME_URI . '/assets/js/tabs.js',
+                [],
+                IDEALBORESH_THEME_VERSION,
+                true
+            );
+        }
+
+        if (is_singular('product')) {
+            wp_enqueue_script(
+                'idealboresh-single-product',
+                IDEALBORESH_THEME_URI . '/assets/js/script-single.js',
+                [],
+                IDEALBORESH_THEME_VERSION,
+                true
+            );
+        }
     }
 
     private function enqueueSwiperAssets(): void

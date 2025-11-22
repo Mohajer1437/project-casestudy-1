@@ -2,6 +2,8 @@
 
 namespace IdealBoresh\Services\WooCommerce;
 
+use IdealBoresh\Domain\Product\DiscountCalculator;
+
 class ProductArchiveService implements ProductArchiveInterface
 {
     private int $productsPerPage;
@@ -52,8 +54,10 @@ class ProductArchiveService implements ProductArchiveInterface
             return $html;
         }
 
-        $percentage = (int) round((($regular - $sale) / $regular) * 100);
-        $percentage = max(0, $percentage);
+        $percentage = DiscountCalculator::calculate($regular, $sale);
+        if ($percentage <= 0) {
+            return $html;
+        }
 
         return sprintf(
             '<span style="z-index: 29; top: 20px; right: 10px;" class="absolute bg-[#D0082C] font-sansFanumBold text-white px-3 py-2 rounded-xl">٪%d</span>',

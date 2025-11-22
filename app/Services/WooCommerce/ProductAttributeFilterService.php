@@ -7,6 +7,12 @@ class ProductAttributeFilterService implements ProductAttributeFilterInterface
     private const FILTER_HOOK = 'idealboresh/archive/popular_attributes';
     private const CACHE_GROUP = 'idealboresh_archive_attributes';
 
+    /** @var array<int, int[]> */
+    private array $termTreeCache = [];
+
+    /** @var array<string, string[]> */
+    private array $taxonomyQueryCache = [];
+
     public function register(): void
     {
         add_filter(self::FILTER_HOOK, [$this, 'getPopularAttributes'], 10, 3);
@@ -72,6 +78,10 @@ class ProductAttributeFilterService implements ProductAttributeFilterInterface
      */
     private function getTermIds(int $categoryId): array
     {
+        if (isset($this->termTreeCache[$categoryId])) {
+            return $this->termTreeCache[$categoryId];
+        }
+
         $termIds = [$categoryId];
         $children = get_terms([
             'taxonomy'   => 'product_cat',
@@ -87,7 +97,10 @@ class ProductAttributeFilterService implements ProductAttributeFilterInterface
         $termIds = array_map('absint', $termIds);
         $termIds = array_filter($termIds, static fn (int $id): bool => $id > 0);
 
-        return array_values(array_unique($termIds));
+        $termIds = array_values(array_unique($termIds));
+        $this->termTreeCache[$categoryId] = $termIds;
+
+        return $termIds;
     }
 
     /**
@@ -96,6 +109,11 @@ class ProductAttributeFilterService implements ProductAttributeFilterInterface
      */
     private function queryAttributeTaxonomies(array $termIds, int $minProducts): array
     {
+        $cacheKey = implode('-', $termIds) . ':' . $minProducts;
+        if (isset($this->taxonomyQueryCache[$cacheKey])) {
+            return $this->taxonomyQueryCache[$cacheKey];
+        }
+
         global $wpdb;
 
         $termIdsString = implode(',', array_map('absint', $termIds));
@@ -126,9 +144,13 @@ class ProductAttributeFilterService implements ProductAttributeFilterInterface
 
         $rows = $wpdb->get_col($prepared);
         if (empty($rows)) {
+            $this->taxonomyQueryCache[$cacheKey] = [];
             return [];
         }
 
-        return array_map('sanitize_key', $rows);
+        $taxonomies = array_map('sanitize_key', $rows);
+        $this->taxonomyQueryCache[$cacheKey] = $taxonomies;
+
+        return $taxonomies;
     }
 }

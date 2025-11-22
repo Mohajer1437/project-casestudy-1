@@ -17,6 +17,12 @@ class TemplateContextProvider implements RegistersHooks
     ) {
     }
 
+    /** @var array<string, mixed> */
+    private array $headerContext = [];
+
+    /** @var array<string, mixed> */
+    private array $footerContext = [];
+
     public function register(): void
     {
         add_action('get_header', [$this, 'shareHeaderContext']);
@@ -30,7 +36,7 @@ class TemplateContextProvider implements RegistersHooks
             return;
         }
 
-        set_query_var('idealboresh_header_context', $this->headerPresenter->buildContext());
+        set_query_var('idealboresh_header_context', $this->getHeaderContext());
     }
 
     public function shareFooterContext(): void
@@ -39,7 +45,7 @@ class TemplateContextProvider implements RegistersHooks
             return;
         }
 
-        set_query_var('idealboresh_footer_context', $this->footerPresenter->buildContext());
+        set_query_var('idealboresh_footer_context', $this->getFooterContext());
     }
 
     /**
@@ -53,5 +59,29 @@ class TemplateContextProvider implements RegistersHooks
         }
 
         return $context;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getHeaderContext(): array
+    {
+        if ($this->headerContext === []) {
+            $this->headerContext = $this->headerPresenter->buildContext();
+        }
+
+        return $this->headerContext;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function getFooterContext(): array
+    {
+        if ($this->footerContext === []) {
+            $this->footerContext = $this->footerPresenter->buildContext();
+        }
+
+        return $this->footerContext;
     }
 }
