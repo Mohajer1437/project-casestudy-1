@@ -9,6 +9,9 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
     /** @var string[] */
     private array $brandTaxonomies = ['product_brand', 'pwb-brand', 'yith_product_brand'];
 
+    /** @var array<string, mixed> */
+    private array $termMetaCache = [];
+
     public function register(): void
     {
         add_action('admin_footer', [$this, 'hideDefaultDescription']);
@@ -51,7 +54,7 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
     public function renderFullDescriptionField(WP_Term $term, string $taxonomy): void
     {
         unset($taxonomy);
-        $value = (string) get_term_meta($term->term_id, 'full_description', true);
+        $value = (string) $this->getCachedMeta($term->term_id, 'full_description', '');
         wp_nonce_field('save_full_description_nonce', 'full_description_nonce');
         ?>
         <tr class="form-field term-full-description-wrap">
@@ -84,11 +87,9 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
         }
 
         if (isset($_POST['full_description'])) {
-            update_term_meta(
-                $termId,
-                'full_description',
-                wp_kses_post(wp_unslash($_POST['full_description']))
-            );
+            $value = wp_kses_post(wp_unslash($_POST['full_description']));
+            update_term_meta($termId, 'full_description', $value);
+            $this->setCachedMeta($termId, 'full_description', $value);
         }
     }
 
@@ -119,7 +120,7 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
     public function renderCategoryShortDescriptionEditField(WP_Term $term, string $taxonomy): void
     {
         unset($taxonomy);
-        $shortDescription = (string) get_term_meta($term->term_id, 'category_short_description', true);
+        $shortDescription = (string) $this->getCachedMeta($term->term_id, 'category_short_description', '');
         wp_nonce_field('save_category_short_description', 'category_short_description_nonce');
         ?>
         <tr class="form-field">
@@ -153,18 +154,16 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
         }
 
         if (isset($_POST['category_short_description'])) {
-            update_term_meta(
-                $termId,
-                'category_short_description',
-                wp_kses_post(wp_unslash($_POST['category_short_description']))
-            );
+            $value = wp_kses_post(wp_unslash($_POST['category_short_description']));
+            update_term_meta($termId, 'category_short_description', $value);
+            $this->setCachedMeta($termId, 'category_short_description', $value);
         }
     }
 
     public function renderFaqField(WP_Term $term, string $taxonomy): void
     {
         unset($taxonomy);
-        $categoryFaqs = get_term_meta($term->term_id, 'product_category_faqs', true);
+        $categoryFaqs = $this->getCachedMeta($term->term_id, 'product_category_faqs', []);
         if (!is_array($categoryFaqs)) {
             $categoryFaqs = [];
         }
@@ -246,8 +245,10 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
 
         if (!empty($faqs)) {
             update_term_meta($termId, 'product_category_faqs', $faqs);
+            $this->setCachedMeta($termId, 'product_category_faqs', $faqs);
         } else {
             delete_term_meta($termId, 'product_category_faqs');
+            $this->setCachedMeta($termId, 'product_category_faqs', []);
         }
     }
 
@@ -292,7 +293,7 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
     public function renderBrandShortDescriptionEditField(WP_Term $term, string $taxonomy): void
     {
         unset($taxonomy);
-        $shortDescription = (string) get_term_meta($term->term_id, 'brand_short_description', true);
+        $shortDescription = (string) $this->getCachedMeta($term->term_id, 'brand_short_description', '');
         wp_nonce_field('save_brand_short_description', 'brand_short_description_nonce');
         ?>
         <tr class="form-field">
@@ -326,11 +327,9 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
         }
 
         if (isset($_POST['brand_short_description'])) {
-            update_term_meta(
-                $termId,
-                'brand_short_description',
-                wp_kses_post(wp_unslash($_POST['brand_short_description']))
-            );
+            $value = wp_kses_post(wp_unslash($_POST['brand_short_description']));
+            update_term_meta($termId, 'brand_short_description', $value);
+            $this->setCachedMeta($termId, 'brand_short_description', $value);
         }
     }
 
@@ -351,5 +350,31 @@ class ProductCategoryMetaService implements ProductCategoryMetaInterface
 
         $nonce = wp_unslash($_POST[$field]);
         return (bool) wp_verify_nonce($nonce, $action);
+    }
+
+    private function getCachedMeta(int $termId, string $key, $default = '')
+    {
+        $cacheKey = $this->buildCacheKey($termId, $key);
+        if (!array_key_exists($cacheKey, $this->termMetaCache)) {
+            $this->termMetaCache[$cacheKey] = get_term_meta($termId, $key, true);
+        }
+
+        $value = $this->termMetaCache[$cacheKey];
+        if ($value === '' || $value === null) {
+            return $default;
+        }
+
+        return $value;
+    }
+
+    private function setCachedMeta(int $termId, string $key, $value): void
+    {
+        $cacheKey = $this->buildCacheKey($termId, $key);
+        $this->termMetaCache[$cacheKey] = $value;
+    }
+
+    private function buildCacheKey(int $termId, string $key): string
+    {
+        return $termId . ':' . $key;
     }
 }

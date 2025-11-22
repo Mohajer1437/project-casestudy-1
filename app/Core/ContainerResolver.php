@@ -8,6 +8,10 @@ class ContainerResolver
 
     public static function boot(Container $container): void
     {
+        if (self::$instance instanceof Container) {
+            return;
+        }
+
         self::$instance = $container;
     }
 
